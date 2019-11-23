@@ -25,24 +25,6 @@ def checkIfProcessRunning(processName):
             pass
     return False;
 
-def DL_check():
-        os.startfile("dropcheck.ahk")
-        serialDL_f = open("serialDL.txt","r")
-        serialWL_f = open("serialWL.txt","r")
-        serialDL = serialDL_f.read()
-        serialWL = serialWL_f.read()
-        
-        if(serialDL == "1" and serialWL == "1"):
-            return "ok"
-        elif(serialDL == "0" and serialWL == "1"):
-            return "DL"
-        elif(serialDL == "1" and serialWL == "0"):
-            return "WL"
-        elif(serialDL == "0" and serialWL == "0"):
-            return "none"
-        
-        #bot.action = False
-
 def pass_change():
     pass_change.door_pass = str(randint(999,9999))
     f = open("sifre.ahk","r",encoding = 'utf-8')
@@ -448,12 +430,6 @@ async def drop(ctx):
         else:
             await ctx.send("**Aracılık işleminde bulunmadığınız için bu komutu kullanma yetkisine sahip değilsiniz**  " + user.mention)
             return
-
-        if(DL_check() == "none"):
-            await ctx.send("**Botta herhangi bir DL veya WL bulunmamakta**  ")
-            bot.satici_geri = 0
-            bot.alici_geri = 0
-            return
             
         await asyncio.sleep(2)
         if(bot.action != False):
@@ -463,12 +439,31 @@ async def drop(ctx):
             return
 
         bot.action = True
+        os.startfile("dropcheck.ahk")
+        await asyncio.sleep(3)
+        serialDL_f = open("serialDL.txt","r")
+        serialWL_f = open("serialWL.txt","r")
+        serialDL = serialDL_f.read()
+        serialWL = serialWL_f.read()
+        print(serialWL)
+        print(serialDL)
+        if(serialDL == "0" and serialWL == "0"):
+            await ctx.send("**Botta herhangi bir DL veya WL bulunmamakta**  ")
+            bot.satici_geri = 0
+            bot.alici_geri = 0
+            bot.action = False
+            serialDL_f.close()
+            serialWL_f.close()
+            return
+
         os.startfile("drop.ahk")
         await asyncio.sleep(10)
         bot.action = False
         await ctx.send("**Bot DL'yi başarıyla geri dropladı**  {} - {}".format(bot.satici_men, bot.alici_men))
         bot.satici_geri = 0
         bot.alici_geri = 0
+        serialDL_f.close()
+        serialWL_f.close()
 
     elif bot.stage == 2:
         await ctx.send("**Aracılığın bu aşamasında DL'yi geri alamazsın, eğer aracılık işlemine devam etmek istemiyorsan `!iptal` komutunu kullanabilirsin**  " + user.mention)
