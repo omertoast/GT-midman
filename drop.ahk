@@ -26,6 +26,13 @@ Loop, 10
 			DLsonuc := 1
             DLkorX := xpos2
             DLkorY := ypos2
+			ControlClick, X%DLkorX% Y%DLkorY% , ahk_exe Growtopia.exe, , LEFT ;DL
+			Sleep, 1000
+			ControlClick, X930 Y649, ahk_exe Growtopia.exe, , LEFT ;drop
+			Sleep, 1500
+			ControlClick, X515 Y469, ahk_exe Growtopia.exe, , LEFT ;drop ok
+			ControlClick, X515 Y469, ahk_exe Growtopia.exe, , LEFT ;drop ok
+			ControlClick, X515 Y469, ahk_exe Growtopia.exe, , LEFT ;drop ok
 			break	
 		}
 	}
@@ -52,7 +59,14 @@ if (DLsonuc = "0")
 				DLsonuc := 1
 				DLkorX := xpos4
 				DLkorY := ypos4
-				break	
+				ControlClick, X%DLkorX% Y%DLkorY% , ahk_exe Growtopia.exe, , LEFT ;DL
+				Sleep, 1000
+				ControlClick, X930 Y649, ahk_exe Growtopia.exe, , LEFT ;drop
+				Sleep, 1500
+				ControlClick, X515 Y469, ahk_exe Growtopia.exe, , LEFT ;drop ok
+				ControlClick, X515 Y469, ahk_exe Growtopia.exe, , LEFT ;drop ok
+				ControlClick, X515 Y469, ahk_exe Growtopia.exe, , LEFT ;drop ok
+				break
 			}
 		}
 		
@@ -63,13 +77,6 @@ if (DLsonuc = "0")
 	}
 }
 
-ControlClick, X%DLkorX% Y%DLkorY% , ahk_exe Growtopia.exe, , LEFT ;DL
-Sleep, 1000
-ControlClick, X930 Y649, ahk_exe Growtopia.exe, , LEFT ;drop
-Sleep, 1500
-ControlClick, X515 Y469, ahk_exe Growtopia.exe, , LEFT ;drop ok
-ControlClick, X515 Y469, ahk_exe Growtopia.exe, , LEFT ;drop ok
-ControlClick, X515 Y469, ahk_exe Growtopia.exe, , LEFT ;drop ok
 Sleep, 1000
 
 xpos := 60
@@ -82,6 +89,7 @@ xpos3 := 60
 
 Loop, 10
 {
+	;MsgBox, sex
 	PixelGetColor, color, %xpos%, %ypos%, RGB
 	if (color = "0xFFF115")
 	{
@@ -92,8 +100,15 @@ Loop, 10
 		{
 ;			MsgBox %xpos2% %ypos2%
 			WLsonuc := 1
-            DLkorX := xpos2
-            DLkorY := ypos2
+            WLkorX := xpos2
+            WLkorY := ypos2
+			ControlClick, X%WLkorX% Y%WLkorY% , ahk_exe Growtopia.exe, , LEFT ;DL
+			Sleep, 1000
+			ControlClick, X930 Y649, ahk_exe Growtopia.exe, , LEFT ;drop
+			Sleep, 1500
+			ControlClick, X515 Y469, ahk_exe Growtopia.exe, , LEFT ;drop ok
+			ControlClick, X515 Y469, ahk_exe Growtopia.exe, , LEFT ;drop ok 
+			ControlClick, X515 Y469, ahk_exe Growtopia.exe, , LEFT ;drop ok
 			break	
 		}
 	}
@@ -118,8 +133,15 @@ if (WLsonuc = "0")
 			{
 	;			MsgBox %xpos2% %ypos2%
 				WLsonuc := 1
-				DLkorX := xpos4
-				DLkorY := ypos4
+				WLkorX := xpos4
+				WLkorY := ypos4
+				ControlClick, X%WLkorX% Y%WLkorY% , ahk_exe Growtopia.exe, , LEFT ;DL
+				Sleep, 1000
+				ControlClick, X930 Y649, ahk_exe Growtopia.exe, , LEFT ;drop
+				Sleep, 1500
+				ControlClick, X515 Y469, ahk_exe Growtopia.exe, , LEFT ;drop ok
+				ControlClick, X515 Y469, ahk_exe Growtopia.exe, , LEFT ;drop ok 
+				ControlClick, X515 Y469, ahk_exe Growtopia.exe, , LEFT ;drop ok
 				break	
 			}
 		}
@@ -130,15 +152,6 @@ if (WLsonuc = "0")
 		}
 	}
 }
-
-ControlClick, X%DLkorX% Y%DLkorY% , ahk_exe Growtopia.exe, , LEFT ;DL
-
-Sleep, 1000
-ControlClick, X930 Y649, ahk_exe Growtopia.exe, , LEFT ;drop
-Sleep, 1500
-ControlClick, X515 Y469, ahk_exe Growtopia.exe, , LEFT ;drop ok
-ControlClick, X515 Y469, ahk_exe Growtopia.exe, , LEFT ;drop ok 
-ControlClick, X515 Y469, ahk_exe Growtopia.exe, , LEFT ;drop ok
 
 ControlClick, X250 Y435, ahk_exe Growtopia.exe, , LEFT,, D ;sağa yürüme iki
 Sleep, 10
