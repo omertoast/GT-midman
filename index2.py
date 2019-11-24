@@ -48,16 +48,16 @@ def remove_tag(string):
     else:
         return "".join(string_list)
 
-def kick_gt(k_member1):
+"""def kick_gt(k_member1):
     k_member1 = k_member1.upper()
     f = open("kick.ahk","r",encoding = 'utf-8')
     lines = f.readlines()
-    lines[0] = "ControlSend,,{{Enter}}{{NumpadDiv}}KICK {}{{Enter}},ahk_exe Growtopia.exe".format(k_member1)
+    lines[0] = "ControlSend,, {{Enter}}{{NumpadDiv}}KICK {}{{Enter}},ahk_exe Growtopia.exe".format(k_member1)
     f.close()
     f = open("kick.ahk","w",encoding = 'utf-8')
     f.writelines(lines)
     f.close()
-    return os.startfile("kick.ahk")
+    return os.startfile("kick.ahk")"""
 
 
 bot = commands.Bot(...)
@@ -147,8 +147,15 @@ async def kick(ctx, member1):
         return
 
     bot.action = True
-    kick_gt(member1)
-    await asyncio.sleep(2)
+    member1 = member1.upper()
+    f = open("kick.ahk","r",encoding = 'utf-8')
+    lines = f.readlines()
+    lines[1] = "ControlSend,, {{Enter}}{{NumpadDiv}}KICK {}{{Enter}},ahk_exe Growtopia.exe".format(member1)
+    f.close()
+    f = open("kick.ahk","w",encoding = 'utf-8')
+    f.writelines(lines)
+    f.close()
+    return os.startfile("kick.ahk")
     bot.action = False
 
 @client.command()
@@ -412,48 +419,63 @@ async def drop(ctx):
     if(bot.iptal_process == True and ctx.author.id != bot.satici_id):
         await ctx.send("**İptal sürecindeyken DL'yi sadece satıcı geri alabilir**  " + user.mention)
         return
-
-    if bot.stage == 1:
-
-        if user.id == bot.satici_id:
-            bot.satici_geri = 1
-            if(bot.alici_geri == 0):
-                await ctx.send("**Satıcı, botun DL'yi geri droplamasını talep etti, bu işlemi onaylamak için `!drop` yazabilirsiniz**  " + bot.satici_men)
-                return
-
-        elif user.id == bot.alici_id:
-            bot.alici_geri = 1
-            if(bot.satici_geri == 0):
-                await ctx.send("**Alıcı, botun DL'yi geri droplamasını talep etti, bu işlemi onaylamak için `!drop` yazabilirsiniz**  " + bot.alici_men)
-                return
-
-        else:
-            await ctx.send("**Aracılık işleminde bulunmadığınız için bu komutu kullanma yetkisine sahip değilsiniz**  " + user.mention)
-            return
-            
-        await asyncio.sleep(2)
-        if(bot.action != False):
+    
+    if(bot.action != False):
             await ctx.send("**Bot şuanda hareket halinde, az sonra tekrar deneyiniz**  " + user.mention)
             bot.alici_geri = 0
             bot.satici_geri = 0
             return
 
-        bot.action = True
-        os.startfile("dropcheck.ahk")
-        await asyncio.sleep(3)
-        serialDL_f = open("serialDL.txt","r")
-        serialWL_f = open("serialWL.txt","r")
-        serialDL = serialDL_f.read()
-        serialWL = serialWL_f.read()
-        print(serialWL)
-        print(serialDL)
-        if(serialDL == "0" and serialWL == "0"):
-            await ctx.send("**Botta herhangi bir DL veya WL bulunmamakta**  ")
-            bot.satici_geri = 0
-            bot.alici_geri = 0
-            bot.action = False
-            serialDL_f.close()
-            serialWL_f.close()
+    if bot.stage == 1:
+
+        if user.id == bot.satici_id:
+            bot.action = True
+            os.startfile("dropcheck.ahk")
+            await asyncio.sleep(2)
+            serialDL_f = open("serialDL.txt","r")
+            serialWL_f = open("serialWL.txt","r")
+            serialDL = serialDL_f.read()
+            serialWL = serialWL_f.read()
+            print(serialWL)
+            print(serialDL)
+            if(serialDL == "0" and serialWL == "0"):
+                await ctx.send("**Botta herhangi bir DL veya WL bulunmamakta**  ")
+                bot.action = False
+                serialDL_f.close()
+                serialWL_f.close()
+                return
+
+            bot.satici_geri = 1
+            if(bot.alici_geri == 0):
+                await ctx.send("**Satıcı, botun DL'yi geri droplamasını talep etti, bu işlemi onaylamak için `!drop` yazabilirsiniz**  " + bot.satici_men)
+                bot.action = False
+                return
+
+        elif user.id == bot.alici_id:
+            bot.action = True
+            os.startfile("dropcheck.ahk")
+            await asyncio.sleep(2)
+            serialDL_f = open("serialDL.txt","r")
+            serialWL_f = open("serialWL.txt","r")
+            serialDL = serialDL_f.read()
+            serialWL = serialWL_f.read()
+            print(serialWL)
+            print(serialDL)
+            if(serialDL == "0" and serialWL == "0"):
+                await ctx.send("**Botta herhangi bir DL veya WL bulunmamakta**  ")
+                bot.action = False
+                serialDL_f.close()
+                serialWL_f.close()
+                return
+
+            bot.alici_geri = 1
+            if(bot.satici_geri == 0):
+                await ctx.send("**Alıcı, botun DL'yi geri droplamasını talep etti, bu işlemi onaylamak için `!drop` yazabilirsiniz**  " + bot.alici_men)
+                bot.action = False
+                return
+
+        else:
+            await ctx.send("**Aracılık işleminde bulunmadığınız için bu komutu kullanma yetkisine sahip değilsiniz**  " + user.mention)
             return
 
         os.startfile("drop.ahk")
