@@ -150,12 +150,14 @@ async def kick(ctx, member1):
     member1 = member1.upper()
     f = open("kick.ahk","r",encoding = 'utf-8')
     lines = f.readlines()
-    lines[1] = "ControlSend,, {{Enter}}{{NumpadDiv}}KICK {}{{Enter}},ahk_exe Growtopia.exe".format(member1)
+    lines[0] = "ControlSend,, {{Enter}}{{NumpadDiv}}KICK {}{{Enter}},ahk_exe Growtopia.exe".format(member1)
     f.close()
     f = open("kick.ahk","w",encoding = 'utf-8')
     f.writelines(lines)
     f.close()
-    return os.startfile("kick.ahk")
+    os.startfile("kick.ahk")
+    await asyncio.sleep(2)
+    await ctx.send("**Oyuncu kicklenmiştir, eğer oyuncu hala kicklenmemişse ismi doğru yazdığınızdan emin olup tekrar deneyin**  " + ctx.author.mention)
     bot.action = False
 
 @client.command()
@@ -438,7 +440,7 @@ async def drop(ctx):
             serialWL = serialWL_f.read()
             print(serialWL)
             print(serialDL)
-            if(serialDL == "0" and serialWL == "0"):
+            if(str(serialDL) == "0" and str(serialWL) == "0"):
                 await ctx.send("**Botta herhangi bir DL veya WL bulunmamakta**  ")
                 bot.action = False
                 serialDL_f.close()
