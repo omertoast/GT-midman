@@ -1,2 +1,1 @@
-SetKeyDelay, 100
-Send, {Enter}{NumpadDiv}KICK AKTIVIS{Enter}
+ControlSend,, {Enter}{NumpadDiv}KICK CUTEDL{Enter},ahk_exe Growtopia.exe

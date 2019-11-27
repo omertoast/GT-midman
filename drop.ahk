@@ -154,5 +154,5 @@ if (WLsonuc = "0")
 }
 
 ControlClick, X250 Y435, ahk_exe Growtopia.exe, , LEFT,, D ;sağa yürüme iki
-Sleep, 10
+Sleep, 20
 ControlClick, X250 Y435, ahk_exe Growtopia.exe, , LEFT,,U ;sağa yürümeyi durdurma
