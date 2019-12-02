@@ -1,0 +1,1 @@
+ControlClick, X610 Y269, ahk_exe Growtopia.exe, , LEFT

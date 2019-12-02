@@ -1,4 +1,5 @@
 wl_miktari = 3
+ControlClick, X169 Y549, ahk_exe Growtopia.exe, , LEFT ;wrench
 CoordMode, Pixel, Client
 
 DLsonuc := 0
@@ -23,6 +24,8 @@ Loop, 10
 			DLsonuc := 1
             DLkorX := xpos2
             DLkorY := ypos2
+			ControlClick, X%DLkorX% Y%DLkorY% , ahk_exe Growtopia.exe, , LEFT ;DL
+			ControlClick, X%DLkorX% Y%DLkorY% , ahk_exe Growtopia.exe, , LEFT ;DL
 			break	
 		}
 	}
@@ -49,7 +52,9 @@ if (DLsonuc = "0")
 				DLsonuc := 1
 				DLkorX := xpos4
 				DLkorY := ypos4
-				break	
+				ControlClick, X%DLkorX% Y%DLkorY% , ahk_exe Growtopia.exe, , LEFT ;DL
+				ControlClick, X%DLkorX% Y%DLkorY% , ahk_exe Growtopia.exe, , LEFT ;DL
+				break
 			}
 		}
 		
@@ -59,9 +64,6 @@ if (DLsonuc = "0")
 		}
 	}
 }
-
-ControlClick, X%DLkorX% Y%DLkorY% , ahk_exe Growtopia.exe, , LEFT ;DL
-ControlClick, X%DLkorX% Y%DLkorY% , ahk_exe Growtopia.exe, , LEFT ;DL
 
 Sleep, 100
 ControlClick, X169 Y549, ahk_exe Growtopia.exe, , LEFT ;wrench

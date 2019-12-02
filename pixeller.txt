@@ -1,0 +1,7 @@
+64 bir blok
+15 blok arası
+
+15,520-540 kordinatlar
+
+DL = 0xD8F4F8, 0xD8F4F8
+WL = 0xFFF115, 0xFFF115
