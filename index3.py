@@ -82,6 +82,31 @@ async def on_ready():
     bot.istekList = pd.DataFrame(columns= ["COSTUMER1_ID","COSTUMER2_ID"])
     bot.siraList = pd.DataFrame(columns= ["COSTUMER1_ID","COSTUMER2_ID"])
 
+    while True:
+        if bot.status == "service":
+            await asyncio.sleep(5)
+
+        else:
+            if bot.action == True:
+                await asyncio.sleep(5)
+
+            else:
+                os.startfile("drop2.ahk")
+                await asyncio.sleep(2)
+                mod_control_f = open("mod_control.txt","r")
+                mod_control = mod_control_f.read()
+                if(str(mod_control) == "0"):
+                    await asyncio.sleep(5)
+
+                elif(str(mod_control) == "1"):
+                    await bot.midman_room_t.send("bakımdayızfeıwuapnefwu")
+                    os.startfile("formod.ahk")
+                    bot.status = "service"
+                    if bot.in_trade == True:
+                        await bot.satici_DM.send("**Bot bakıma girdi açılınca haber veririz  **" + bot.satici_men)
+                        await bot.alici_DM.send("**Bot bakıma girdi açılınca haber veririz  **" + bot.alici_men)
+        
+
 @client.event
 async def on_message(message):
     if message.content == "YOU DID IT YOU CRAZY BASTARD":
@@ -125,32 +150,38 @@ async def yoket(ctx):
 
     bot.in_trade = "siradaki"
     while(bot.in_trade == "siradaki"):
-        if(bot.siraList.empty == True):
-            print("boş kardeşim")
-            bot.in_trade = "False"
-            break
-        bot.siradaki = bot.siraList.head(1)
-        print(bot.siradaki)
-        bot.pot_satici_id = int(bot.siradaki["COSTUMER1_ID"].values)
-        bot.pot_alici_id = int(bot.siradaki["COSTUMER2_ID"].values)
+        if bot.status == "service":
+            await asyncio.sleep(5)
 
-        print(bot.pot_alici_id)
-        print(bot.pot_satici_id)
+        else:
+            if(bot.siraList.empty == True):
+                print("boş kardeşim")
+                bot.in_trade = "False"
+                break
+            
+            else:
+                bot.siradaki = bot.siraList.head(1)
+                print(bot.siradaki)
+                bot.pot_satici_id = int(bot.siradaki["COSTUMER1_ID"].values)
+                bot.pot_alici_id = int(bot.siradaki["COSTUMER2_ID"].values)
 
-        bot.pot_satici = bot.GT_guild.get_member(bot.pot_satici_id)
-        bot.pot_alici = bot.GT_guild.get_member(bot.pot_alici_id)
+                print(bot.pot_alici_id)
+                print(bot.pot_satici_id)
 
-        await bot.invite_room_t.send("**Sıranız geldi! Aracılığa başlamak için 30 saniye içinde `!kabul` yazabilirsiniz  {} - {}**".format(bot.pot_satici.mention, bot.pot_alici.mention))
-        await asyncio.sleep(30)
-        bot.siraList = bot.siraList[bot.siraList.COSTUMER1_ID != bot.pot_satici_id]
+                bot.pot_satici = bot.GT_guild.get_member(bot.pot_satici_id)
+                bot.pot_alici = bot.GT_guild.get_member(bot.pot_alici_id)
 
-    ctx.send("yaptım kanka :wink:")
-
-    return
+                await bot.invite_room_t.send("**Sıranız geldi! Aracılığa başlamak için 30 saniye içinde `!kabul` yazabilirsiniz  {} - {}**".format(bot.pot_satici.mention, bot.pot_alici.mention))
+                await asyncio.sleep(30)
+                bot.siraList = bot.siraList[bot.siraList.COSTUMER1_ID != bot.pot_satici_id]
 
 @client.command()
 #@commands.cooldown(1, 10.00 , BucketType.member)
 async def istek(ctx,costumer_2: discord.Member):
+    if bot.status == "service":
+        ctx.send("**Bot şuanda bakımda, lütfen daha sonra tekrar deneyiniz**  " + ctx.author.mention)
+        return
+
     if ctx.channel != bot.invite_room_t:
         await ctx.send("**Aracılık isteği göndermek için {} odasına gidiniz.".format(bot.invite_room_t.mention))
         return
@@ -181,6 +212,10 @@ async def istek(ctx,costumer_2: discord.Member):
 
 @client.command()
 async def kick(ctx, member1):
+    if bot.status == "service":
+        ctx.send("**Bot şuanda bakımda, lütfen daha sonra tekrar deneyiniz**  " + ctx.author.mention)
+        return
+
     if(bot.iptal_process == True and ctx.author.id == bot.satici_id):
             bot.action = True
             member1 = member1.upper()
@@ -224,6 +259,9 @@ async def kick(ctx, member1):
 
 @client.command()
 async def onay(ctx):
+    if bot.status == "service":
+        ctx.send("**Bot şuanda bakımda, lütfen daha sonra tekrar deneyiniz**  " + ctx.author.mention)
+        return
 
     if ctx.channel != bot.midman_room_t:
         await ctx.send("**Bu komutu sadece {} kanalında kullanabilirsin {}**"  .format(bot.midman_room_t, ctx.author.mention))
@@ -243,6 +281,7 @@ async def onay(ctx):
     serialWL_f = open("serialWL.txt","r")
     serialDL = serialDL_f.read()
     serialWL = serialWL_f.read()
+    bot.action = False
     if(str(serialDL) == "0" and str(serialWL) == "0"):
         await ctx.send("**Botta herhangi bir DL veya WL bulunmuyor**  " + ctx.author.mention)
         bot.action = False
@@ -264,7 +303,8 @@ async def onay(ctx):
         bot.action = False
         bot.stage = 2
         await bot.midman_room_t.send("**Aşama** :two:: Alıcı, satıcının verdiği kart numarasına parayı atacak. Satıcı parasının hesabına geldiğinden emin olduktan sonra `!onay` yazarak aracılık işlemni tamamlayabilirsiniz. Eğer bir sorun çıkar ise `!iptal` yazarak aracılık işlemini iptal edebilirsiniz**  {} - {}".format(bot.satici_men, bot.alici_men))
-    
+        bot.satici_onay = 0
+        bot.alici_onay = 0 
     elif(bot.stage == 2):
         if ctx.author.id == bot.satici_id:
             bot.satici_onay = 1
@@ -308,7 +348,7 @@ async def onay(ctx):
             """
 
 
-        await asyncio.sleep(20)
+        await asyncio.sleep(240)
         await bot.satici_mem.remove_roles(bot.costumer_role)
         await bot.alici_mem.remove_roles(bot.costumer_role)
         bot.stage = 0
@@ -337,24 +377,38 @@ async def onay(ctx):
 
         bot.in_trade = "siradaki"
         while(bot.in_trade == "siradaki"):
-            if(bot.siraList.empty == True):
-                print("boş kardeşim")
-                bot.in_trade = "False"
-                break
-            bot.siradaki = bot.siraList.head(1)
-            bot.pot_satici_id = int(bot.siradaki["COSTUMER1_ID"].values)
-            bot.pot_alici_id = int(bot.siradaki["COSTUMER2_ID"].values)
+            if bot.status == "service":
+                await asyncio.sleep(5)
 
-            bot.pot_satici = bot.GT_guild.get_member(bot.pot_satici_id)
-            bot.pot_alici = bot.GT_guild.get_member(bot.pot_alici_id)
+            else:
+                if(bot.siraList.empty == True):
+                    print("boş kardeşim")
+                    bot.in_trade = "False"
+                    break
+                
+                else:
+                    bot.siradaki = bot.siraList.head(1)
+                    print(bot.siradaki)
+                    bot.pot_satici_id = int(bot.siradaki["COSTUMER1_ID"].values)
+                    bot.pot_alici_id = int(bot.siradaki["COSTUMER2_ID"].values)
 
-            await bot.invite_room_t.send("**Sıranız geldi! Aracılığa başlamak için 30 saniye içinde `!kabul` yazabilirsiniz  {} - {}**".format(bot.pot_satici.mention, bot.pot_alici.mention))
-            await asyncio.sleep(30)
-            bot.siraList = bot.siraList[bot.siraList.COSTUMER1_ID != bot.pot_satici_id]
+                    print(bot.pot_alici_id)
+                    print(bot.pot_satici_id)
+
+                    bot.pot_satici = bot.GT_guild.get_member(bot.pot_satici_id)
+                    bot.pot_alici = bot.GT_guild.get_member(bot.pot_alici_id)
+
+                    await bot.invite_room_t.send("**Sıranız geldi! Aracılığa başlamak için 30 saniye içinde `!kabul` yazabilirsiniz  {} - {}**".format(bot.pot_satici.mention, bot.pot_alici.mention))
+                    await asyncio.sleep(30)
+                    bot.siraList = bot.siraList[bot.siraList.COSTUMER1_ID != bot.pot_satici_id]
 
     
 @client.command()
 async def iptal(ctx):
+    if bot.status == "service":
+        ctx.send("**Bot şuanda bakımda, lütfen daha sonra tekrar deneyiniz**  " + ctx.author.mention)
+        return
+
     if(bot.iptal_process == True):
         await ctx.send("**Aracılık işlemi zaten iptal ediliyor**  " + ctx.author.mention)
         return
@@ -530,21 +584,30 @@ async def iptal(ctx):
 
     bot.in_trade = "siradaki"
     while(bot.in_trade == "siradaki"):
-        if(bot.siraList.empty == True):
-            print("boş kardeşim")
-            bot.in_trade = "False"
-            break
-        bot.siradaki = bot.siraList.head(1)
-        print(bot.siradaki)
-        bot.pot_satici_id = int(bot.siradaki["COSTUMER1_ID"].values)
-        bot.pot_alici_id = int(bot.siradaki["COSTUMER2_ID"].values)
+        if bot.status == "service":
+            await asyncio.sleep(5)
 
-        bot.pot_satici = bot.GT_guild.get_member(bot.pot_satici_id)
-        bot.pot_alici = bot.GT_guild.get_member(bot.pot_alici_id)
+        else:
+            if(bot.siraList.empty == True):
+                print("boş kardeşim")
+                bot.in_trade = "False"
+                break
+            
+            else:
+                bot.siradaki = bot.siraList.head(1)
+                print(bot.siradaki)
+                bot.pot_satici_id = int(bot.siradaki["COSTUMER1_ID"].values)
+                bot.pot_alici_id = int(bot.siradaki["COSTUMER2_ID"].values)
 
-        await bot.invite_room_t.send("**Sıranız geldi! Aracılığa başlamak için 30 saniye içinde `!kabul` yazabilirsiniz  {} - {}**".format(bot.pot_satici.mention, bot.pot_alici.mention))
-        await asyncio.sleep(30)
-        bot.siraList = bot.siraList[bot.siraList.COSTUMER1_ID != bot.pot_satici_id]
+                print(bot.pot_alici_id)
+                print(bot.pot_satici_id)
+
+                bot.pot_satici = bot.GT_guild.get_member(bot.pot_satici_id)
+                bot.pot_alici = bot.GT_guild.get_member(bot.pot_alici_id)
+
+                await bot.invite_room_t.send("**Sıranız geldi! Aracılığa başlamak için 30 saniye içinde `!kabul` yazabilirsiniz  {} - {}**".format(bot.pot_satici.mention, bot.pot_alici.mention))
+                await asyncio.sleep(30)
+                bot.siraList = bot.siraList[bot.siraList.COSTUMER1_ID != bot.pot_satici_id]
 
 @client.command()
 async def komutlar(ctx):
@@ -580,6 +643,10 @@ async def sıra(ctx):
 
 @client.command()
 async def kabul(ctx,costumer_1: discord.Member = None):
+    if bot.status == "service":
+        ctx.send("**Bot şuanda bakımda, lütfen daha sonra tekrar deneyiniz**  " + ctx.author.mention)
+        return
+
     if ctx.channel != bot.invite_room_t:
         await ctx.send("**Bu komutu sadece {} kanalında kullanabilirsin  {}**".format(bot.invite_room_t.mention, ctx.author.mention))
         return
@@ -746,24 +813,30 @@ async def kabul(ctx,costumer_1: discord.Member = None):
 
                 bot.in_trade = "siradaki"
                 while(bot.in_trade == "siradaki"):
-                    if(bot.siraList.empty == True):
-                        print("boş kardeşim")
-                        bot.in_trade = "False"
-                        break
-                    bot.siradaki = bot.siraList.head(1)
-                    print(bot.siradaki)
-                    bot.pot_satici_id = int(bot.siradaki["COSTUMER1_ID"].values)
-                    bot.pot_alici_id = int(bot.siradaki["COSTUMER2_ID"].values)
+                    if bot.status == "service":
+                        await asyncio.sleep(5)
 
-                    print(bot.pot_alici_id)
-                    print(bot.pot_satici_id)
+                    else:
+                        if(bot.siraList.empty == True):
+                            print("boş kardeşim")
+                            bot.in_trade = "False"
+                            break
+                        
+                        else:
+                            bot.siradaki = bot.siraList.head(1)
+                            print(bot.siradaki)
+                            bot.pot_satici_id = int(bot.siradaki["COSTUMER1_ID"].values)
+                            bot.pot_alici_id = int(bot.siradaki["COSTUMER2_ID"].values)
 
-                    bot.pot_satici = bot.GT_guild.get_member(bot.pot_satici_id)
-                    bot.pot_alici = bot.GT_guild.get_member(bot.pot_alici_id)
+                            print(bot.pot_alici_id)
+                            print(bot.pot_satici_id)
 
-                    await bot.invite_room_t.send("**Sıranız geldi! Aracılığa başlamak için 30 saniye içinde `!kabul` yazabilirsiniz  {} - {}**".format(bot.pot_satici.mention, bot.pot_alici.mention))
-                    await asyncio.sleep(30)
-                    bot.siraList = bot.siraList[bot.siraList.COSTUMER1_ID != bot.pot_satici_id]
+                            bot.pot_satici = bot.GT_guild.get_member(bot.pot_satici_id)
+                            bot.pot_alici = bot.GT_guild.get_member(bot.pot_alici_id)
+
+                            await bot.invite_room_t.send("**Sıranız geldi! Aracılığa başlamak için 30 saniye içinde `!kabul` yazabilirsiniz  {} - {}**".format(bot.pot_satici.mention, bot.pot_alici.mention))
+                            await asyncio.sleep(30)
+                            bot.siraList = bot.siraList[bot.siraList.COSTUMER1_ID != bot.pot_satici_id]
             
             else:
                 bot.action = False
@@ -859,29 +932,39 @@ async def kabul(ctx,costumer_1: discord.Member = None):
 
             bot.in_trade = "siradaki"
             while(bot.in_trade == "siradaki"):
-                if(bot.siraList.empty == True):
-                    print("boş kardeşim")
-                    bot.in_trade = "False"
-                    return
-                bot.siradaki = bot.siraList.head(1)
-                print(bot.siradaki)
-                bot.pot_satici_id = int(bot.siradaki["COSTUMER1_ID"].values)
-                bot.pot_alici_id = int(bot.siradaki["COSTUMER2_ID"].values)
+                if bot.status == "service":
+                    await asyncio.sleep(5)
 
-                print(bot.pot_alici_id)
-                print(bot.pot_satici_id)
+                else:
+                    if(bot.siraList.empty == True):
+                        print("boş kardeşim")
+                        bot.in_trade = "False"
+                        break
+                    
+                    else:
+                        bot.siradaki = bot.siraList.head(1)
+                        print(bot.siradaki)
+                        bot.pot_satici_id = int(bot.siradaki["COSTUMER1_ID"].values)
+                        bot.pot_alici_id = int(bot.siradaki["COSTUMER2_ID"].values)
 
-                bot.pot_satici = bot.GT_guild.get_member(bot.pot_satici_id)
-                bot.pot_alici = bot.GT_guild.get_member(bot.pot_alici_id)
+                        print(bot.pot_alici_id)
+                        print(bot.pot_satici_id)
 
-                await bot.invite_room_t.send("**Sıranız geldi! Aracılığa başlamak için 30 saniye içinde `!kabul` yazabilirsiniz  {} - {}**".format(bot.pot_satici.mention, bot.pot_alici.mention))
-                await asyncio.sleep(30)
-                bot.siraList = bot.siraList[bot.siraList.COSTUMER1_ID != bot.pot_satici_id]
+                        bot.pot_satici = bot.GT_guild.get_member(bot.pot_satici_id)
+                        bot.pot_alici = bot.GT_guild.get_member(bot.pot_alici_id)
+
+                        await bot.invite_room_t.send("**Sıranız geldi! Aracılığa başlamak için 30 saniye içinde `!kabul` yazabilirsiniz  {} - {}**".format(bot.pot_satici.mention, bot.pot_alici.mention))
+                        await asyncio.sleep(30)
+                        bot.siraList = bot.siraList[bot.siraList.COSTUMER1_ID != bot.pot_satici_id]
 
 
 @client.command()
 async def yenisifre(ctx):   
     user = ctx.author
+
+    if bot.status == "service":
+        ctx.send("**Bot şuanda bakımda, lütfen daha sonra tekrar deneyiniz**  " + ctx.author.mention)
+        return
 
     if(bot.iptal_process == True and ctx.author.id != bot.satici_id):
         await ctx.send("**İptal sürecindeyken şifreyi sadece satıcı değiştirebilir**  " + user.mention)
@@ -926,6 +1009,11 @@ async def yenisifre(ctx):
 @client.command()
 async def drop(ctx):
     user = ctx.author
+
+    if bot.status == "service":
+        ctx.send("**Bot şuanda bakımda, lütfen daha sonra tekrar deneyiniz**  " + ctx.author.mention)
+        return
+
     if ctx.channel != bot.midman_room_t:
         await ctx.send("**Bu komutu sadece {} kanalında kullanabilirsin**  {}".format(bot.midman_room_t.mention,ctx.author.mention))
         return

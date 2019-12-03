@@ -87,6 +87,14 @@ async def on_message(message):
     if message.content == "YOU DID IT YOU CRAZY BASTARD":
         await message.channel.send(":sunglasses:")
     await client.process_commands(message)
+"""
+while True:
+    if bot.action == True:
+        asyncio.sleep(5)
+    
+    else:
+        print("sex")"""
+
 
 @client.command()
 async def yoket(ctx):
@@ -151,6 +159,13 @@ async def yoket(ctx):
 @client.command()
 #@commands.cooldown(1, 10.00 , BucketType.member)
 async def istek(ctx,costumer_2: discord.Member):
+    while True:
+        if bot.action == True:
+            asyncio.sleep(5)
+
+        else:
+            print("sex")
+    
     if ctx.channel != bot.invite_room_t:
         await ctx.send("**Aracılık isteği göndermek için {} odasına gidiniz.".format(bot.invite_room_t.mention))
         return
