@@ -302,9 +302,10 @@ async def onay(ctx):
 
         bot.action = False
         bot.stage = 2
-        await bot.midman_room_t.send("**Aşama** :two:: Alıcı, satıcının verdiği kart numarasına parayı atacak. Satıcı parasının hesabına geldiğinden emin olduktan sonra `!onay` yazarak aracılık işlemni tamamlayabilirsiniz. Eğer bir sorun çıkar ise `!iptal` yazarak aracılık işlemini iptal edebilirsiniz**  {} - {}".format(bot.satici_men, bot.alici_men))
+        await bot.midman_room_t.send("**Aşama :two:: Alıcı, satıcının verdiği kart numarasına parayı atacak. Satıcı parasının hesabına geldiğinden emin olduktan sonra `!onay` yazarak aracılık işlemni tamamlayabilirsiniz. Eğer bir sorun çıkar ise `!iptal` yazarak aracılık işlemini iptal edebilirsiniz**  {} **-** {}".format(bot.satici_men, bot.alici_men))
         bot.satici_onay = 0
         bot.alici_onay = 0 
+
     elif(bot.stage == 2):
         if ctx.author.id == bot.satici_id:
             bot.satici_onay = 1
@@ -323,7 +324,7 @@ async def onay(ctx):
         await asyncio.sleep(5)
         await bot.alici_DM.send(pass_change.door_pass)
         os.startfile("kasa.ahk")
-        await asncio.sleep(6)
+        await asyncio.sleep(6)
         bot.action = False
         bot.stage = 3
         await ctx.send("**Aracılık işlemi tamamlandı, 4 dakika içinde eğer botun bulunduğu alanda birisi varsa `!kick (Kullacının ismi)` komutuyla oyuncuyu kickleyip, `!drop` komutuyla DL'nizi alabilirsiniz**")
@@ -402,7 +403,22 @@ async def onay(ctx):
                     await asyncio.sleep(30)
                     bot.siraList = bot.siraList[bot.siraList.COSTUMER1_ID != bot.pot_satici_id]
 
-    
+@client.command()
+async def get(ctx):
+    if bot.status == "service":
+        await ctx.send("**Bot şuanda bakımda, lütfen daha sonra tekrar deneyiniz**  " + ctx.author.mention)
+        return
+
+    if bot.action == "True":
+        await ctx.send("**Bot şuan hareket halinde, az sonra tekrar deneyiniz**  " + ctx.author.mention)
+        return
+
+    bot.action = True
+    await ctx.send("**Miktar başarıyla alındı**  " + ctx.author.mention)
+    os.startfile("get.ahk")
+    await asyncio.sleep(2)
+    bot.action = False
+
 @client.command()
 async def iptal(ctx):
     if bot.status == "service":
@@ -419,10 +435,6 @@ async def iptal(ctx):
 
     if bot.in_trade == "False":
         await ctx.send("**Şuanda herhangi bir aracılık işlemi bulunmamaktadır**  " + user.mention)
-        return
-
-    if(bot.action == True):
-        await ctx.send("**Bot şuan hareket halinde, az sonra tekrar deneyiniz**  " + ctx.author.mention)
         return
 
     if bot.stage == 1:
@@ -750,6 +762,9 @@ async def kabul(ctx,costumer_1: discord.Member = None):
     await asyncio.sleep(180)
     
     while True:
+        if bot.total_trade != trade_no:
+            return
+
         if bot.action == True:
             await asyncio.sleep(5)
         else:
@@ -769,9 +784,12 @@ async def kabul(ctx,costumer_1: discord.Member = None):
                 bot.action = False
                 break
     
-    await asyncio.sleep(10)
+    await asyncio.sleep(60)
 
     while True:
+        if bot.total_trade != trade_no:
+            return
+
         if bot.action == True:
             await asyncio.sleep(5)
         else:
