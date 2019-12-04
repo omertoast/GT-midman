@@ -5,7 +5,6 @@ import os
 import time
 import pandas as pd
 import asyncio
-from discord.ext.commands.cooldowns import BucketType
 
 TOKEN = "NjM3MzgwODQ3ODg4MjM2NTk2.XbNVbg.1Y8VcCCcIL0mSQ34XGNcHhnfub0"
 client = commands.Bot(command_prefix = "!")
@@ -32,18 +31,6 @@ def remove_tag(string):
 
     else:
         return "".join(string_list)
-
-"""def kick_gt(k_member1):
-    k_member1 = k_member1.upper()
-    f = open("kick.ahk","r",encoding = 'utf-8')
-    lines = f.readlines()
-    lines[0] = "ControlSend,, {{Enter}}{{NumpadDiv}}KICK {}{{Enter}},ahk_exe Growtopia.exe".format(k_member1)
-    f.close()
-    f = open("kick.ahk","w",encoding = 'utf-8')
-    f.writelines(lines)
-    f.close()
-    return os.startfile("kick.ahk")"""
-
 
 bot = commands.Bot(...)
 
@@ -786,7 +773,7 @@ async def kabul(ctx,costumer_1: discord.Member = None):
 
     await bot.satici_mem.add_roles(bot.costumer_role)
     await bot.alici_mem.add_roles(bot.costumer_role)
-    await bot.midman_room_t.send("**Aşama :one:: Satıcı, GrowtopiaTC1 worldüne gidip DM'den aldığı şifreyi kullanarak botun yanına giderek aracılık yapılacak DL miktarını alıcının gözü önünde droplasın. Alıcı istediği miktarın droplandığından emin olduktan sonra `!onay` yazarak 2. aşamaya geçebilirsiniz**  {} **-** {}".format(bot.satici_men, bot.alici_men))
+    await bot.midman_room_t.send("**Aşama :one:: Satıcı, BarisMarket1 worldüne gidip DM'den aldığı şifreyi kullanarak botun yanına giderek aracılık yapılacak DL miktarını alıcının gözü önünde droplasın. Alıcı istediği miktarın droplandığından emin olduktan sonra `!onay` yazarak 2. aşamaya geçebilirsiniz**  {} **-** {}".format(bot.satici_men, bot.alici_men))
     bot.action = True
     pass_change()
     await asyncio.sleep(5)
@@ -1039,7 +1026,7 @@ async def bakim(ctx):
     
     bot.status = "service"
 
-async def bakim(ctx):
+async def online(ctx):
     if ctx.channel != bot.seks_room_t:
         return
     

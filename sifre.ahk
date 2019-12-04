@@ -1,4 +1,4 @@
-pass = 1034
+pass = 3633
 
 
 ControlClick, X169 Y549, ahk_exe Growtopia.exe, , LEFT ;wrench
