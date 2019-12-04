@@ -179,7 +179,7 @@ async def yoket(ctx):
 #@commands.cooldown(1, 10.00 , BucketType.member)
 async def istek(ctx,costumer_2: discord.Member):
     if bot.status == "service":
-        ctx.send("**Bot şuanda bakımda, lütfen daha sonra tekrar deneyiniz**  " + ctx.author.mention)
+        await ctx.send("**Bot şuanda bakımda, lütfen daha sonra tekrar deneyiniz**  " + ctx.author.mention)
         return
 
     if ctx.channel != bot.invite_room_t:
@@ -196,13 +196,13 @@ async def istek(ctx,costumer_2: discord.Member):
         await ctx.send("**Kendi kendine istek gönderemezsin**  " + ctx.author.mention)
         return
     
-    """if costumer_1_id == bot.satici_id or costumer_1_id == bot.alici_id:
+    if costumer_1_id == bot.satici_id or costumer_1_id == bot.alici_id:
         await ctx.send("**Aracılık işlemindeyken istek gönderemezsin**  " + ctx.author.mention)
         return
 
     if costumer_2_id == bot.satici_id or costumer_2_id == bot.alici_id:
         await ctx.send("**İstek gönderdiğiniz kişi halihazırda bir aracılık işleminde**  " + ctx.author.mention)
-        return"""
+        return
 
     new_istek = {"COSTUMER1_ID": costumer_1_id,"COSTUMER2_ID": costumer_2_id}
     bot.istekList = bot.istekList.append(new_istek, ignore_index = True)
@@ -260,7 +260,7 @@ async def kick(ctx, member1):
 @client.command()
 async def onay(ctx):
     if bot.status == "service":
-        ctx.send("**Bot şuanda bakımda, lütfen daha sonra tekrar deneyiniz**  " + ctx.author.mention)
+        await ctx.send("**Bot şuanda bakımda, lütfen daha sonra tekrar deneyiniz**  " + ctx.author.mention)
         return
 
     if ctx.channel != bot.midman_room_t:
@@ -319,6 +319,8 @@ async def onay(ctx):
                 await ctx.send("**Alıcı, parayı gönderdiğini onayladı, paranın geldiğinden emin olduktan sonra `!onay` yazarak aracılık işlemini tamamlayabilirsiniz**  " + bot.satici_men)
                 return
         
+        trade_no = bot.total_trade
+        await ctx.send("**Aracılık işlemi tamamlandı, 4 dakika içinde eğer botun bulunduğu alanda birisi varsa `!kick (Kullacının ismi)` komutuyla oyuncuyu kickleyip, `!drop` komutuyla DL'nizi alabilirsiniz**")
         bot.action = True
         pass_change()
         await asyncio.sleep(5)
@@ -327,29 +329,17 @@ async def onay(ctx):
         await asyncio.sleep(6)
         bot.action = False
         bot.stage = 3
-        await ctx.send("**Aracılık işlemi tamamlandı, 4 dakika içinde eğer botun bulunduğu alanda birisi varsa `!kick (Kullacının ismi)` komutuyla oyuncuyu kickleyip, `!drop` komutuyla DL'nizi alabilirsiniz**")
-        
-        """
-        while i < 240:
-            await asyncio.sleep(5)
-            if bot.action == True:
-                await asyncio.sleep(5)
-                i += 10
-            else:
-                bot.action = True
-                os.startfile("dropcheck.ahk")
-                await asyncio.sleep(2)
-                serialDL_f = open("serialDL.txt","r")
-                serialWL_f = open("serialWL.txt","r")
-                serialDL = serialDL_f.read()
-                serialWL = serialWL_f.read()
-                if(str(serialDL) == "0" and str(serialWL) == "0"):
-
-                else:
-            """
-
 
         await asyncio.sleep(240)
+
+        if bot.total_trade != trade_no:
+            return
+
+        if bot.in_trade != True:
+            return
+
+        await bot.alici_DM.send("**DL'nizi 4 dakika içinde almadığınız için DL'nize el konulmuştur. Yetkili birisi müsait olduğunda sizinle iletişime geçip DL'nizi iade edecektir**  " + bot.alici_men)
+        
         await bot.satici_mem.remove_roles(bot.costumer_role)
         await bot.alici_mem.remove_roles(bot.costumer_role)
         bot.stage = 0
@@ -370,6 +360,30 @@ async def onay(ctx):
         bot.alici_mem = 0
         bot.satici_DM = 0
         bot.alici_DM = 0
+
+        bot.action = True
+        os.startfile("dropcheck.ahk")
+        await asyncio.sleep(2)
+        serialDL_f = open("serialDL.txt","r")
+        serialWL_f = open("serialWL.txt","r")
+        serialDL = serialDL_f.read()
+        serialWL = serialWL_f.read()
+
+        if(str(serialDL) == "1" and str(serialWL) == "0"):
+            os.startfile("yedek_kasa_DL.ahk")
+            await asyncio.sleep(5)
+
+        elif(str(serialDL) == "0" and str(serialWL) == "1"):
+            os.startfile("yedek_kasa_WL.ahk")
+            await asyncio.sleep(5)
+
+        elif(str(serialDL) == "1" and str(serialWL) == "1"):
+            os.startfile("yedek_kasa_DL.ahk")
+            await asyncio.sleep(5)
+            os.startfile("yedek_kasa_WL.ahk")
+            await asyncio.sleep(5)
+
+        bot.action = False
 
         if(bot.siraList.empty == True):
             print("boş kardeşim")
@@ -408,21 +422,46 @@ async def get(ctx):
     if bot.status == "service":
         await ctx.send("**Bot şuanda bakımda, lütfen daha sonra tekrar deneyiniz**  " + ctx.author.mention)
         return
+    
+    if ctx.channel != bot.midman_room_t:
+        await ctx.send("**Bu komutu sadece {} kanalında kullanabilirsin {}**"  .format(bot.midman_room_t, ctx.author.mention))
+        return
+
+    if ctx.author.id != bot.satici_id:
+        await ctx.send("**Bu komutu yalnız satıcı kullanabilir**  " + ctx.author.mention)
+        return
 
     if bot.action == "True":
         await ctx.send("**Bot şuan hareket halinde, az sonra tekrar deneyiniz**  " + ctx.author.mention)
         return
 
+    if bot.stage != 1:
+        await ctx.send("**Bu komut aracılığın bu aşamasında çalışmaz**  " + ctx.author.mention)
+        return
+
     bot.action = True
-    await ctx.send("**Miktar başarıyla alındı**  " + ctx.author.mention)
     os.startfile("get.ahk")
     await asyncio.sleep(2)
-    bot.action = False
+    os.startfile("dropcheck.ahk")
+    await asyncio.sleep(2)
+    serialDL_f = open("serialDL.txt","r")
+    serialWL_f = open("serialWL.txt","r")
+    serialDL = serialDL_f.read()
+    serialWL = serialWL_f.read()
+    if(str(serialDL) == "0" and str(serialWL) == "0"):
+        await ctx.send("**Bot herhangi bir WL veya DL almadı**  " + ctx.author.mention)
+        bot.action = False
+        return
+    
+    else:
+        await ctx.send("**Miktar başarıyla alındı**  " + ctx.author.mention)
+        bot.action = False
+        return
 
 @client.command()
 async def iptal(ctx):
     if bot.status == "service":
-        ctx.send("**Bot şuanda bakımda, lütfen daha sonra tekrar deneyiniz**  " + ctx.author.mention)
+        await ctx.send("**Bot şuanda bakımda, lütfen daha sonra tekrar deneyiniz**  " + ctx.author.mention)
         return
 
     if(bot.iptal_process == True):
@@ -434,7 +473,7 @@ async def iptal(ctx):
         return
 
     if bot.in_trade == "False":
-        await ctx.send("**Şuanda herhangi bir aracılık işlemi bulunmamaktadır**  " + user.mention)
+        await ctx.send("**Şuanda herhangi bir aracılık işlemi bulunmamaktadır**  " + ctx.author.mention)
         return
 
     if bot.stage == 1:
@@ -485,6 +524,14 @@ async def iptal(ctx):
             await ctx.send("**Aracılık işlemi iptal edilmiştir. 4 dakika içinde botun yanında biri var ise `!kick (Kullacının ismi)` komutuyla oyuncuyu kickleyip, `!drop` komutuyla DL'nizi geri alabilirsin  **  " + bot.satici_men)
             
             await asyncio.sleep(240)
+
+            if bot.total_trade != trade_no:
+                return
+
+            if bot.in_trade != True:
+                return
+
+            await bot.satici_DM.send("**DL'nizi 4 dakika içinde almadığınızdan dolayı DL'nize el konulmuştur. Herhangi bir yetkili müsait olduğunda DL'nizi geri verecektir**  " + bot.satici_men)
             await bot.satici_mem.remove_roles(bot.costumer_role)
             await bot.alici_mem.remove_roles(bot.costumer_role)
             bot.stage = 0
@@ -574,21 +621,6 @@ async def iptal(ctx):
             bot.satici_DM = 0
             bot.alici_DM = 0
 
-            if(str(serialDL) == "1" and str(serialWL) == "0"):
-                os.startfile("yedek_kasa_DL.ahk")
-                await asyncio.sleep(5)
-
-            elif(str(serialDL) == "0" and str(serialWL) == "1"):
-                os.startfile("yedek_kasa_WL.ahk")
-                await asyncio.sleep(5)
-
-            elif(str(serialDL) == "1" and str(serialWL) == "1"):
-                os.startfile("yedek_kasa_DL.ahk")
-                await asyncio.sleep(5)
-                os.startfile("yedek_kasa_WL.ahk")
-                await asyncio.sleep(5)
-
-
     if(bot.siraList.empty == True):
         print("boş kardeşim")
         bot.in_trade = "False"
@@ -621,9 +653,11 @@ async def iptal(ctx):
                 await asyncio.sleep(30)
                 bot.siraList = bot.siraList[bot.siraList.COSTUMER1_ID != bot.pot_satici_id]
 
+"""
 @client.command()
 async def komutlar(ctx):
     ctx.send("**!istek:** Satıcıysanız, `!istek @KullanıcıAdı` şeklinde alıcıyı etiketleyerek aracılık isteğinizi gönderebilirsiniz.\n**!kabul:** Gönderilen aracılık isteğini `!kabul @KullanıcıAdı` şeklinde aracılık isteğini kabul edebilirsiniz.\n**!yenisifre:** Şifreli kapının şifresini değiştirir.\n**!drop** Bottaki DL'yi geri droplar\n**!onay:** ARACILIK İŞLEMİNİ ONAYLAR VE OH BE BİTTİ DERSİNİZ PARANIZ CEBİNİZDE KALIR\n" + ctx.author.mention)
+"""
 
 @client.command()
 async def sıra(ctx):
@@ -656,7 +690,7 @@ async def sıra(ctx):
 @client.command()
 async def kabul(ctx,costumer_1: discord.Member = None):
     if bot.status == "service":
-        ctx.send("**Bot şuanda bakımda, lütfen daha sonra tekrar deneyiniz**  " + ctx.author.mention)
+        await ctx.send("**Bot şuanda bakımda, lütfen daha sonra tekrar deneyiniz**  " + ctx.author.mention)
         return
 
     if ctx.channel != bot.invite_room_t:
@@ -765,24 +799,30 @@ async def kabul(ctx,costumer_1: discord.Member = None):
         if bot.total_trade != trade_no:
             return
 
-        if bot.action == True:
-            await asyncio.sleep(5)
-        else:
-            bot.action = True
-            os.startfile("dropcheck.ahk")
-            await asyncio.sleep(2)
-            serialDL_f = open("serialDL.txt","r")
-            serialWL_f = open("serialWL.txt","r")
-            serialDL = serialDL_f.read()
-            serialWL = serialWL_f.read()
-            if(str(serialDL) == "0" and str(serialWL) == "0"):
-                await bot.midman_room_t.send("**1 dakika içerisinde bota DL koymazsanız aracılık işleminiz iptal olacaktır**  {} - {}".format(bot.alici_men, bot.satici_men))
-                bot.action = False
-                break
-            
+        if bot.in_trade != True:
+            return
+
+        if bot.stage == 1:
+            if bot.action == True:
+                await asyncio.sleep(5)
             else:
-                bot.action = False
-                break
+                bot.action = True
+                os.startfile("dropcheck.ahk")
+                await asyncio.sleep(2)
+                serialDL_f = open("serialDL.txt","r")
+                serialWL_f = open("serialWL.txt","r")
+                serialDL = serialDL_f.read()
+                serialWL = serialWL_f.read()
+                if(str(serialDL) == "0" and str(serialWL) == "0"):
+                    await bot.midman_room_t.send("**1 dakika içerisinde bota DL koymazsanız aracılık işleminiz iptal olacaktır**  {} - {}".format(bot.alici_men, bot.satici_men))
+                    bot.action = False
+                    break
+                
+                else:
+                    bot.action = False
+                    break
+        else:
+            break
     
     await asyncio.sleep(60)
 
@@ -790,87 +830,105 @@ async def kabul(ctx,costumer_1: discord.Member = None):
         if bot.total_trade != trade_no:
             return
 
-        if bot.action == True:
-            await asyncio.sleep(5)
-        else:
-            bot.action = True
-            os.startfile("dropcheck.ahk")
-            await asyncio.sleep(2)
-            serialDL_f = open("serialDL.txt","r")
-            serialWL_f = open("serialWL.txt","r")
-            serialDL = serialDL_f.read()
-            serialWL = serialWL_f.read()
-            if(str(serialDL) == "0" and str(serialWL) == "0"):
-                await bot.alici_DM.send("**Aracılık işleminiz 4 dakika içerisinde herhangi bir DL koymadığınız için iptal olmuştur**  " + bot.alici_men)
-                await bot.satici_DM.send("**Aracılık işleminiz 4 dakika içerisinde herhangi bir DL koymadığınız için iptal olmuştur**  " + bot.satici_men)
-                await bot.satici_mem.remove_roles(bot.costumer_role)
-                await bot.alici_mem.remove_roles(bot.costumer_role)
-                bot.stage = 0
-                bot.satici_iptal = 0
-                bot.alici_iptal = 0
-                bot.iptal_process = False
-                bot.satici_geri = 0
-                bot.alici_geri = 0
-                bot.alici_onay = 0
-                bot.satici_onay = 0
-                bot.pot_alici_iptal = 0
-                bot.pot_satici_iptal = 0
-                bot.satici_id = 0
-                bot.alici_id = 0
-                bot.satici_men = 0
-                bot.alici_men = 0
-                bot.satici_mem = 0
-                bot.alici_mem = 0
-                bot.satici_DM = 0
-                bot.alici_DM = 0
-                bot.action = False
-                if(bot.siraList.empty == True):
-                    print("boş kardeşim")
-                    bot.in_trade = "False"
-                    return
+        if bot.in_trade != True:
+            return
 
-                bot.in_trade = "siradaki"
-                while(bot.in_trade == "siradaki"):
-                    if bot.status == "service":
-                        await asyncio.sleep(5)
-
-                    else:
-                        if(bot.siraList.empty == True):
-                            print("boş kardeşim")
-                            bot.in_trade = "False"
-                            break
-                        
-                        else:
-                            bot.siradaki = bot.siraList.head(1)
-                            print(bot.siradaki)
-                            bot.pot_satici_id = int(bot.siradaki["COSTUMER1_ID"].values)
-                            bot.pot_alici_id = int(bot.siradaki["COSTUMER2_ID"].values)
-
-                            print(bot.pot_alici_id)
-                            print(bot.pot_satici_id)
-
-                            bot.pot_satici = bot.GT_guild.get_member(bot.pot_satici_id)
-                            bot.pot_alici = bot.GT_guild.get_member(bot.pot_alici_id)
-
-                            await bot.invite_room_t.send("**Sıranız geldi! Aracılığa başlamak için 30 saniye içinde `!kabul` yazabilirsiniz  {} - {}**".format(bot.pot_satici.mention, bot.pot_alici.mention))
-                            await asyncio.sleep(30)
-                            bot.siraList = bot.siraList[bot.siraList.COSTUMER1_ID != bot.pot_satici_id]
-            
+        if bot.stage == 1:
+            if bot.action == True:
+                await asyncio.sleep(5)
             else:
-                bot.action = False
-                break
-    
-    await asyncio.sleep(5)
-    print("biz burdayizzz")
-    if bot.total_trade != trade_no:
-        return
-    
-    await bot.midman_room_t.send("**Aracılık işleminizi 2 dakika içinde bitirmezseniz, aracılık işlemi sonlandırılacaktır  {} - {}**".format(bot.satici_men, bot.alici_men))
+                bot.action = True
+                os.startfile("dropcheck.ahk")
+                await asyncio.sleep(2)
+                serialDL_f = open("serialDL.txt","r")
+                serialWL_f = open("serialWL.txt","r")
+                serialDL = serialDL_f.read()
+                serialWL = serialWL_f.read()
+                if(str(serialDL) == "0" and str(serialWL) == "0"):
+                    await bot.alici_DM.send("**Aracılık işleminiz 4 dakika içerisinde herhangi bir DL koymadığınız için iptal olmuştur**  " + bot.alici_men)
+                    await bot.satici_DM.send("**Aracılık işleminiz 4 dakika içerisinde herhangi bir DL koymadığınız için iptal olmuştur**  " + bot.satici_men)
+                    await bot.satici_mem.remove_roles(bot.costumer_role)
+                    await bot.alici_mem.remove_roles(bot.costumer_role)
+                    bot.stage = 0
+                    bot.satici_iptal = 0
+                    bot.alici_iptal = 0
+                    bot.iptal_process = False
+                    bot.satici_geri = 0
+                    bot.alici_geri = 0
+                    bot.alici_onay = 0
+                    bot.satici_onay = 0
+                    bot.pot_alici_iptal = 0
+                    bot.pot_satici_iptal = 0
+                    bot.satici_id = 0
+                    bot.alici_id = 0
+                    bot.satici_men = 0
+                    bot.alici_men = 0
+                    bot.satici_mem = 0
+                    bot.alici_mem = 0
+                    bot.satici_DM = 0
+                    bot.alici_DM = 0
+                    bot.action = False
+                    if(bot.siraList.empty == True):
+                        print("boş kardeşim")
+                        bot.in_trade = "False"
+                        return
 
+                    bot.in_trade = "siradaki"
+                    while(bot.in_trade == "siradaki"):
+                        if bot.status == "service":
+                            await asyncio.sleep(5)
+
+                        else:
+                            if(bot.siraList.empty == True):
+                                print("boş kardeşim")
+                                bot.in_trade = "False"
+                                break
+                            
+                            else:
+                                bot.siradaki = bot.siraList.head(1)
+                                print(bot.siradaki)
+                                bot.pot_satici_id = int(bot.siradaki["COSTUMER1_ID"].values)
+                                bot.pot_alici_id = int(bot.siradaki["COSTUMER2_ID"].values)
+
+                                print(bot.pot_alici_id)
+                                print(bot.pot_satici_id)
+
+                                bot.pot_satici = bot.GT_guild.get_member(bot.pot_satici_id)
+                                bot.pot_alici = bot.GT_guild.get_member(bot.pot_alici_id)
+
+                                await bot.invite_room_t.send("**Sıranız geldi! Aracılığa başlamak için 30 saniye içinde `!kabul` yazabilirsiniz  {} - {}**".format(bot.pot_satici.mention, bot.pot_alici.mention))
+                                await asyncio.sleep(30)
+                                bot.siraList = bot.siraList[bot.siraList.COSTUMER1_ID != bot.pot_satici_id]
+                
+                else:
+                    bot.action = False
+                    break
+        else:
+            break
+
+    await asyncio.sleep(180)
     if bot.total_trade != trade_no:
         return
+
+    if bot.in_trade != True:
+        return
     
+    if bot.stage == 3:
+        return
+
+    await bot.midman_room_t.send("**Aracılık işleminizi 2 dakika içinde bitirmezseniz, aracılık işlemi sonlandırılacaktır  {} - {}**".format(bot.satici_men, bot.alici_men))
+    
+    await asyncio.sleep(120)
     while True:
+        if bot.total_trade != trade_no:
+            return
+
+        if bot.in_trade != True:
+            return
+    
+        if bot.stage == 3:
+            return
+
         if bot.action == True:
             await asyncio.sleep(5)
         else:
@@ -975,13 +1033,24 @@ async def kabul(ctx,costumer_1: discord.Member = None):
                         await asyncio.sleep(30)
                         bot.siraList = bot.siraList[bot.siraList.COSTUMER1_ID != bot.pot_satici_id]
 
+async def bakim(ctx):
+    if ctx.channel != bot.seks_room_t:
+        return
+    
+    bot.status = "service"
+
+async def bakim(ctx):
+    if ctx.channel != bot.seks_room_t:
+        return
+    
+    bot.status = "np"
 
 @client.command()
 async def yenisifre(ctx):   
     user = ctx.author
 
     if bot.status == "service":
-        ctx.send("**Bot şuanda bakımda, lütfen daha sonra tekrar deneyiniz**  " + ctx.author.mention)
+        await ctx.send("**Bot şuanda bakımda, lütfen daha sonra tekrar deneyiniz**  " + ctx.author.mention)
         return
 
     if(bot.iptal_process == True and ctx.author.id != bot.satici_id):
@@ -990,7 +1059,7 @@ async def yenisifre(ctx):
 
     if ctx.channel != bot.midman_room_t:
         await ctx.send("**Bu komutu sadece {} kanalında kullanabilirsin  {}**".format(bot.midman_room_t, ctx.author.mention))
-        return
+        return  
 
     if bot.in_trade == "False":
         await ctx.send("**Şuanda herhangi bir aracılık işlemi bulunmamaktadır**  " + user.mention)
@@ -1017,7 +1086,7 @@ async def yenisifre(ctx):
                 pass_change()
                 await asyncio.sleep(5)
                 bot.action = False
-                await bot.satici_DM.send(pass_change.door_pass)
+                await bot.alici_DM.send(pass_change.door_pass)
 
             elif bot.action == True:
                 await ctx.send("**Bot şuanda hareket halinde, az sonra tekrar deneyiniz**  " + user.mention)
@@ -1029,7 +1098,7 @@ async def drop(ctx):
     user = ctx.author
 
     if bot.status == "service":
-        ctx.send("**Bot şuanda bakımda, lütfen daha sonra tekrar deneyiniz**  " + ctx.author.mention)
+        await ctx.send("**Bot şuanda bakımda, lütfen daha sonra tekrar deneyiniz**  " + ctx.author.mention)
         return
 
     if ctx.channel != bot.midman_room_t:
@@ -1049,6 +1118,75 @@ async def drop(ctx):
             bot.alici_geri = 0
             bot.satici_geri = 0
             return
+
+    if(bot.iptal_process == True):
+        if(ctx.author.id != bot.satici_id):
+            await ctx.send("**Aracılığın bu aşamasında DL'yi sadece satıcı alabilir**  " + ctx.author.mention)
+            return
+        
+        if(bot.action != False):
+            await ctx.send("**Bot şuanda hareket halinde, az sonra tekrar deneyiniz**  " + user.mention)
+            return
+
+        await ctx.send("**Bot DL'yi dropladı**  " + ctx.author.mention)
+        bot.action = True
+        os.startfile("drop.ahk")
+        await asyncio.sleep(10)
+        bot.action = False
+
+        await bot.satici_mem.remove_roles(bot.costumer_role)
+        await bot.alici_mem.remove_roles(bot.costumer_role)
+        bot.stage = 0
+        bot.satici_iptal = 0
+        bot.alici_iptal = 0
+        bot.iptal_process = False
+        bot.satici_geri = 0
+        bot.alici_geri = 0
+        bot.alici_onay = 0
+        bot.satici_onay = 0
+        bot.pot_alici_iptal = 0
+        bot.pot_satici_iptal = 0
+        bot.satici_id = 0
+        bot.alici_id = 0
+        bot.satici_men = 0
+        bot.alici_men = 0
+        bot.satici_mem = 0
+        bot.alici_mem = 0
+        bot.satici_DM = 0
+        bot.alici_DM = 0
+
+        if(bot.siraList.empty == True):
+            print("boş kardeşim")
+            bot.in_trade = "False"
+            return
+
+        bot.in_trade = "siradaki"
+        while(bot.in_trade == "siradaki"):
+            if bot.status == "service":
+                await asyncio.sleep(5)
+
+            else:
+                if(bot.siraList.empty == True):
+                    print("boş kardeşim")
+                    bot.in_trade = "False"
+                    return
+                
+                else:
+                    bot.siradaki = bot.siraList.head(1)
+                    print(bot.siradaki)
+                    bot.pot_satici_id = int(bot.siradaki["COSTUMER1_ID"].values)
+                    bot.pot_alici_id = int(bot.siradaki["COSTUMER2_ID"].values)
+
+                    print(bot.pot_alici_id)
+                    print(bot.pot_satici_id)
+
+                    bot.pot_satici = bot.GT_guild.get_member(bot.pot_satici_id)
+                    bot.pot_alici = bot.GT_guild.get_member(bot.pot_alici_id)
+
+                    await bot.invite_room_t.send("**Sıranız geldi! Aracılığa başlamak için 30 saniye içinde `!kabul` yazabilirsiniz  {} - {}**".format(bot.pot_satici.mention, bot.pot_alici.mention))
+                    await asyncio.sleep(30)
+                    bot.siraList = bot.siraList[bot.siraList.COSTUMER1_ID != bot.pot_satici_id]
+
 
     if bot.stage == 1:
 
@@ -1120,11 +1258,63 @@ async def drop(ctx):
             await ctx.send("**Bot şuanda hareket halinde, az sonra tekrar deneyiniz**  " + user.mention)
             return
 
+        await ctx.send("**Bot DL'yi dropladı**  " + ctx.author.mention)
         bot.action = True
         os.startfile("drop.ahk")
         await asyncio.sleep(10)
         bot.action = False
 
-        await ctx.send("**Bot DL'yi dropladı**  " + ctx.author.mention)
+        await bot.satici_mem.remove_roles(bot.costumer_role)
+        await bot.alici_mem.remove_roles(bot.costumer_role)
+        bot.stage = 0
+        bot.satici_iptal = 0
+        bot.alici_iptal = 0
+        bot.iptal_process = False
+        bot.satici_geri = 0
+        bot.alici_geri = 0
+        bot.alici_onay = 0
+        bot.satici_onay = 0
+        bot.pot_alici_iptal = 0
+        bot.pot_satici_iptal = 0
+        bot.satici_id = 0
+        bot.alici_id = 0
+        bot.satici_men = 0
+        bot.alici_men = 0
+        bot.satici_mem = 0
+        bot.alici_mem = 0
+        bot.satici_DM = 0
+        bot.alici_DM = 0
+
+        if(bot.siraList.empty == True):
+            print("boş kardeşim")
+            bot.in_trade = "False"
+            return
+
+        bot.in_trade = "siradaki"
+        while(bot.in_trade == "siradaki"):
+            if bot.status == "service":
+                await asyncio.sleep(5)
+
+            else:
+                if(bot.siraList.empty == True):
+                    print("boş kardeşim")
+                    bot.in_trade = "False"
+                    break
+                
+                else:
+                    bot.siradaki = bot.siraList.head(1)
+                    print(bot.siradaki)
+                    bot.pot_satici_id = int(bot.siradaki["COSTUMER1_ID"].values)
+                    bot.pot_alici_id = int(bot.siradaki["COSTUMER2_ID"].values)
+
+                    print(bot.pot_alici_id)
+                    print(bot.pot_satici_id)
+
+                    bot.pot_satici = bot.GT_guild.get_member(bot.pot_satici_id)
+                    bot.pot_alici = bot.GT_guild.get_member(bot.pot_alici_id)
+
+                    await bot.invite_room_t.send("**Sıranız geldi! Aracılığa başlamak için 30 saniye içinde `!kabul` yazabilirsiniz  {} - {}**".format(bot.pot_satici.mention, bot.pot_alici.mention))
+                    await asyncio.sleep(30)
+                    bot.siraList = bot.siraList[bot.siraList.COSTUMER1_ID != bot.pot_satici_id]
 
 client.run(TOKEN)

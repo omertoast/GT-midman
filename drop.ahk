@@ -152,7 +152,16 @@ if (WLsonuc = "0")
 		}
 	}
 }
-
+Sleep, 1500
+ControlClick, X250 Y550, ahk_exe Growtopia.exe, , LEFT
+ControlClick, X930 Y649, ahk_exe Growtopia.exe, , LEFT ;drop
+Sleep, 3000
+ControlSend,,{BackSpace}{BackSpace}{BackSpace}1,ahk_exe Growtopia.exe
+Sleep, 1000
+ControlClick, X515 Y469, ahk_exe Growtopia.exe, , LEFT ;drop ok
+ControlClick, X515 Y469, ahk_exe Growtopia.exe, , LEFT ;drop ok 
+ControlClick, X515 Y469, ahk_exe Growtopia.exe, , LEFT ;drop ok
+Sleep, 1000
 ControlClick, X250 Y435, ahk_exe Growtopia.exe, , LEFT,, D ;sağa yürüme iki
-Sleep, 20
+Sleep, 300
 ControlClick, X250 Y435, ahk_exe Growtopia.exe, , LEFT,,U ;sağa yürümeyi durdurma
