@@ -172,7 +172,7 @@ async def istek(ctx,costumer_2: discord.Member):
         return
 
     if ctx.channel != bot.invite_room_t:
-        await ctx.send("**Aracılık isteği göndermek için {} odasına gidiniz.".format(bot.invite_room_t.mention))
+        await ctx.send("**Aracılık isteği göndermek için {} odasına gidiniz  {}**".format(bot.invite_room_t.mention,ctx.author.mention))
         return
 
     costumer_1 = "<@" + str(ctx.author.id) + ">"
